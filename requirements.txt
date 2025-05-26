@@ -1,0 +1,8 @@
+pandas
+numpy
+flask
+nltk
+scikit-learn
+opencv-python
+tensorflow
+pyttsx3

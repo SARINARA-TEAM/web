@@ -1,116 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SARINARA</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-
-<!-- Header -->
-<header>
-  <div class="navbar">
-    <div class="logo">SARINARA</div>
-  </div>
-  
-  <nav>
-    <ul class="nav-links">
-      <li><a href="/home">Home</a></li>
-      <li><a href="/detection">Detection</a></li>
-      <li><a href="/kluster">Cluster</a></li>
-      <li><a href="/team" class="team-btn">Team</a></li>
-    </ul>
-  </nav>
-</header>
-
-<!-- Main Content -->
-<main>
-  <section class="hero-section">
-    <div class="left-content">
-      <h1 class="h1">Smoking Detection</h1>
-    </div>
-    <div class="right-content">
-      <div class="card">
-        <h2>Sistem Deteksi Merokok di Area Terlarang Menggunakan Teknologi Computer Vision dan Chatbot Rule Based</h2>
-        <p>
-          Sistem Deteksi Merokok di Area Terlarang Menggunakan Teknologi Computer Vision dan Chatbot Rule Based adalah sistem berbasis kamera yang secara otomatis mendeteksi aktivitas merokok di area yang dilarang. Sistem ini memanfaatkan computer vision untuk menganalisis video secara real-time dan mengenali tindakan merokok. Ketika terdeteksi, sistem akan memberikan peringatan berupa teks dan suara, serta menyediakan chatbot berbasis rule-based yang bisa menjawab pertanyaan umum seputar aturan merokok dan dampaknya.
-        </p>
-        <hr>
-        <p class="benefit">
-          <span class="arrow">→</span>STOP merokok disembarang tempat !
-        </p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SARINARA</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="navbar">
+        <div class="logo">SARINARA</div>
       </div>
-    </div>
-  </section>
 
-  <!-- Tombol Chat -->
-  <div class="chat-button" onclick="toggleChat()">
-    💬
-  </div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/">Home</a></li>
+          <li><a href="/detection">Detection</a></li>
+          <li><a href="/kluster">Cluster</a></li>
+          <li><a href="/team" class="team-btn">Team</a></li>
+        </ul>
+      </nav>
+    </header>
 
-  <!-- Chat Container -->
-  <div class="chat-container" id="chatbot">
-    <div class="chat-header">
-      Chat with Us
-      <span class="close-btn" onclick="toggleChat()">×</span>
-    </div>
-    <div class="chat-box" id="chat-box"></div>
-    <div class="chat-input-container">
-      <input type="text" id="user-input" placeholder="Tanya sesuatu..." class="chat-input" onkeydown="if(event.key === 'Enter') sendMessage()" />
-      <button class="send-button" onclick="sendMessage()">Kirim</button>
-    </div>
-  </div>
+    <!-- Main Content -->
+    <main>
+      <section class="hero-section">
+        <div class="left-content">
+          <h1 class="h1">Smoking Detection</h1>
+        </div>
+        <div class="right-content">
+          <div class="card">
+            <h2>
+              Sistem Deteksi Merokok di Area Terlarang Menggunakan Teknologi
+              Computer Vision dan Chatbot Rule Based
+            </h2>
+            <p>
+              Sistem Deteksi Merokok di Area Terlarang Menggunakan Teknologi
+              Computer Vision dan Chatbot Rule Based adalah sistem berbasis
+              kamera yang secara otomatis mendeteksi aktivitas merokok di area
+              yang dilarang. Sistem ini memanfaatkan computer vision untuk
+              menganalisis video secara real-time dan mengenali tindakan
+              merokok. Ketika terdeteksi, sistem akan memberikan peringatan
+              berupa teks dan suara, serta menyediakan chatbot berbasis
+              rule-based yang bisa menjawab pertanyaan umum seputar aturan
+              merokok dan dampaknya.
+            </p>
+            <hr />
+            <p class="benefit">
+              <span class="arrow">→</span>STOP merokok disembarang tempat !
+            </p>
+          </div>
+        </div>
+      </section>
 
-</main>
+      <!-- Tombol Chat -->
+      <div class="chat-button" onclick="toggleChat()">💬</div>
 
-<!-- Footer -->
-<footer>
-  <div class="footer-content">
-    <p>&copy; 2025 Sistem Deteksi Merokok</p>
-  </div>
-</footer>
+      <!-- Chat Container -->
+      <div class="chat-container" id="chatbot">
+        <div class="chat-header">
+          Chat with Us
+          <span class="close-btn" onclick="toggleChat()">×</span>
+        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-input-container">
+          <input
+            type="text"
+            id="user-input"
+            placeholder="Tanya sesuatu..."
+            class="chat-input"
+            onkeydown="if(event.key === 'Enter') sendMessage()"
+          />
+          <button class="send-button" onclick="sendMessage()">Kirim</button>
+        </div>
+      </div>
+    </main>
 
-<!-- Script -->
-<script>
-  function toggleChat() {
-    const chatBox = document.getElementById('chatbot');
-    if (chatBox.style.display === "none" || chatBox.style.display === "") {
-      chatBox.style.display = "flex";
-    } else {
-      chatBox.style.display = "none";
-    }
-  }
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <p>&copy; 2025 Sistem Deteksi Merokok</p>
+      </div>
+    </footer>
 
-  function sendMessage() {
-    let input = document.getElementById('user-input');
-    let userMessage = input.value.trim();
-    if (userMessage === "") return;
+    <!-- Script -->
+    <script>
+      function toggleChat() {
+        const chatBox = document.getElementById("chatbot");
+        if (chatBox.style.display === "none" || chatBox.style.display === "") {
+          chatBox.style.display = "flex";
+        } else {
+          chatBox.style.display = "none";
+        }
+      }
 
-    let chatBox = document.getElementById('chat-box');
+      function sendMessage() {
+        let input = document.getElementById("user-input");
+        let userMessage = input.value.trim();
+        if (userMessage === "") return;
 
-    // Tampilkan pesan pengguna
-    let userBubble = document.createElement('div');
-    userBubble.className = "bubble user-bubble";
-    userBubble.innerText = userMessage;
-    chatBox.appendChild(userBubble);
-    input.value = '';
+        let chatBox = document.getElementById("chat-box");
 
-    // Scroll otomatis ke bawah
-    chatBox.scrollTop = chatBox.scrollHeight;
+        // Tampilkan pesan pengguna
+        let userBubble = document.createElement("div");
+        userBubble.className = "bubble user-bubble";
+        userBubble.innerText = userMessage;
+        chatBox.appendChild(userBubble);
+        input.value = "";
 
-    // Dummy respons (ganti dengan fetch API jika punya backend)
-    setTimeout(() => {
-      let botBubble = document.createElement('div');
-      botBubble.className = "bubble bot-bubble";
-      botBubble.innerText = "Ini adalah respons dari bot.";
-      chatBox.appendChild(botBubble);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }, 500);
-  }
-</script>
+        // Scroll otomatis ke bawah
+        chatBox.scrollTop = chatBox.scrollHeight;
+        fetch(`/get_response/${encodeURIComponent(userMessage)}`)
+          .then((response) => response.json())
+          .then((data) => {
+            let botBubble = document.createElement("div");
+            botBubble.className = "bubble bot-bubble";
+            botBubble.innerText = data.response;
+            chatBox.appendChild(botBubble);
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll ke bawah
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
 
-
-
-</body>
+        // // Dummy respons (ganti dengan fetch API jika punya backend)
+        // setTimeout(() => {
+        //   let botBubble = document.createElement('div');
+        //   botBubble.className = "bubble bot-bubble";
+        //   botBubble.innerText = "Ini adalah respons dari bot.";
+        //   chatBox.appendChild(botBubble);
+        //   chatBox.scrollTop = chatBox.scrollHeight;
+        // }, 500);
+      }
+    </script>
+  </body>
 </html>
