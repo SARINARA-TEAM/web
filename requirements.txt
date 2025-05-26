@@ -1,8 +1,8 @@
-pandas
-numpy
-flask
-nltk
-scikit-learn
-opencv-python
-tensorflow
-pyttsx3
+pandas==2.2.3
+numpy==2.1.3
+Flask==3.1.1
+nltk==3.9.1
+scikit-learn==1.6.1
+opencv-python==4.11.0
+tensorflow==2.19.0
+pyttsx3==2.98

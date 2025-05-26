@@ -1,11 +1,15 @@
 import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 # Load model Keras
-MODEL_PATH = 'mobilenetv2_binary_classifier8.h5'
+MODEL_PATH = 'models/mobilenetv2_binary_classifier8.h5'
+# MODEL_PATH = 'models/mobilenetv2.h5'
+# MODEL_PATH = 'models/resnet50v2.h5'
 
-HAAR_CASCADE_PATH = 'haarcascade_frontalface_alt2.xml'
+
+HAAR_CASCADE_PATH = 'models/haarcascade_frontalface_alt2.xml'
 
 # Label class
 CLASS_NAMES = ['not_smoking', 'smoking']
@@ -14,7 +18,7 @@ try:
     model = load_model(MODEL_PATH)
     body_cascade = cv2.CascadeClassifier(HAAR_CASCADE_PATH)
     if body_cascade.empty():
-        raise ValueError("Gagal memuat file haarcascade_frontalface_alt2.xml")
+        raise ValueError("Gagal memuat file haarcascade xml")
 except Exception as e:
     raise ValueError(f"Gagal memuat model: {e}")
 
