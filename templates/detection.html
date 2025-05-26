@@ -1,0 +1,159 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection</title>
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+      .cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;          
+    gap: 24px;
+    padding: 30px 0;
+}
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    flex: 0 0 auto;
+}
+.card {
+    width: 220px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+    text-align: center;
+    padding-bottom: 15px;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.image-placeholder {
+    width: 100%;
+    height: 120px;
+    background: #ddd;
+    border-radius: 10px 10px 0 0;
+    overflow: hidden;
+}
+.zat-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.card h3 {
+    font-size: 1rem;
+    margin: 12px 0 4px;
+    font-weight: bold;
+}
+.card p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0;
+}
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+      <div class="navbar">
+        <div class="logo">SARINARA</div>
+      </div>
+      
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/home">Home</a></li>
+          <li><a href="/detection">Detection</a></li>
+          <li><a href="/kluster">Cluster</a></li>
+          <li><a href="/team" class="team-btn">Team</a></li>
+        </ul>
+      </nav>
+    </header>
+
+<!---main content-->
+<section class="video-section">
+    <h2 style="text-align: center; margin-bottom: 10px;">REAL TIME MONITORING</h2>
+    <div class="video-container">
+        <video id="cctv-video" controls autoplay muted>
+            <source src="{{ url_for('static', filename='video/cctv.mp4') }}" type="video/mp4">
+            Browser Anda tidak mendukung video tag ini.
+        </video>
+    </div>
+
+    <div class="hero">
+      <div class="info-bar">
+        <div class="info-item" id="tanggal">📅 Tanggal</div>
+        <div class="info-item" id="waktu">📍 Waktu</div>
+    </div>
+
+    <div class="cards">
+      <a href="{{ url_for('detail_zat', zat_id=0) }}" class="card-link">
+          <div class="card">
+              <div class="image-placeholder">
+                  <img src="{{ url_for('static', filename='assets/tar.jpg') }}" alt="Zat Tar" class="zat-image">
+              </div>
+              <h3>Zat Berbahaya rokok</h3>
+              <p>BERBAHAYA</p>
+          </div>
+      </a>
+      <a href="{{ url_for('detail_zat', zat_id=1) }}" class="card-link">
+          <div class="card">
+              <div class="image-placeholder">
+                  <img src="{{ url_for('static', filename='assets/nikotin.png') }}" alt="Zat Tar" class="zat-image">
+              </div>
+              <h3>Zat Berbahaya rokok</h3>
+              <p>BERBAHAYA</p>
+          </div>
+      </a>
+      <a href="{{ url_for('detail_zat', zat_id=2) }}" class="card-link">
+          <div class="card">
+              <div class="image-placeholder">
+                  <img src="{{ url_for('static', filename='assets/carbon.png') }}" alt="Zat Tar" class="zat-image">
+              </div>
+              <h3>Zat Berbahaya rokok</h3>
+              <p>BERBAHAYA</p>
+          </div>
+      </a>
+      <a href="{{ url_for('detail_zat', zat_id=3) }}" class="card-link">
+          <div class="card">
+              <div class="image-placeholder">
+                  <img src="{{ url_for('static', filename='assets/sianida.png') }}" alt="Zat Tar" class="zat-image">
+              </div>
+              <h3>Zat Berbahaya rokok</h3>
+              <p>BERBAHAYA</p>
+          </div>
+      </a>
+    </div>
+    <section class="text-to-speech">
+        <h3>ANNOUNCEMENT 📣</h3>
+        <input type="text" id="text-to-speak" placeholder="Masukkan teks di sini" class="speech-input">
+        <button onclick="speakText()" class="speak-button">Ucapkan</button>
+    </section>
+</section>
+
+<script>
+  function updateDateTime() {
+            const now = new Date();
+            const optionsTanggal = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = now.toLocaleDateString('id-ID', optionsTanggal);
+            const formattedTime = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('tanggal').innerHTML = `📅 ${formattedDate}`;
+            document.getElementById('waktu').innerHTML = `⏰ ${formattedTime}`;
+        }
+        // Jalankan pertama kali
+        updateDateTime();
+        // Update setiap detik
+        setInterval(updateDateTime, 1000);
+</script>
+<footer>
+  <div class="footer-content">
+      <p>&copy; 2025 Sistem Deteksi Merokok</p>
+  </div>
+</footer>
+</body>
+</html>
