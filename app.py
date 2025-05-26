@@ -5,51 +5,91 @@ from detect import process_frame
 from utils.tts import speak
 import time
 import threading
+import numpy as np
 
 app = Flask(__name__)
 
 
 # Status global
+stop_detect = False
+latest_frame = None
 latest_status = {"label": None}
 last_tts_time = 0
 
-def generate_frames():
-    global latest_status, last_tts_time
+def detection_loop():
+    global latest_status, last_tts_time, latest_frame, stop_detect
     cap = cv2.VideoCapture(0)
     # cap = cv2.VideoCapture(r"http://192.168.1.7:81/stream", cv2.CAP_FFMPEG)  # URL kamera ESP32-CAM http://192.168.1.1:81/stream
 
     if not cap.isOpened():
         print("Kamera tidak bisa dibuka!")
         return
-    
-    while True:
+        
+    print("Kamera berhasil dibuka")
+
+    while not stop_detect:
         success, frame = cap.read()
         if not success:
             print("Gagal baca frame dari kamera")
             break
-        
-        detected_frame, label = process_frame(frame)
-        latest_status["label"] = label
-        
-        current_time = time.time()
-        if label == "smoking" and (current_time - last_tts_time) > 10:
-            threading.Thread(target=speak, args=("smoking detected, don't smoking in this area!",)).start()
-            last_tts_time = current_time
-        else:
-            pass
+            
+        try: 
+            detected_frame, label = process_frame(frame)
+            latest_status["label"] = label
+            
+            current_time = time.time()
+            if label == "smoking" and (current_time - last_tts_time) > 10:
+                threading.Thread(target=speak, args=("smoking detected, don't smoking in this area!",)).start()
+                last_tts_time = current_time
+            else:
+                pass
 
-        ret, buffer = cv2.imencode('.jpg', detected_frame)
-        frame_bytes = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+            ret, buffer = cv2.imencode('.jpg', detected_frame)
+            latest_frame = buffer.tobytes()
+
+        except Exception as e:
+            print(f"Error detection_loop {e}")
+    cap.release()
+    print("camera released and detection stopped.")
+
+detection_thread = None
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/start')
+def start_detection():
+    global detection_thread, stop_detect
+    if detection_thread is None or not detection_thread.is_alive():
+        stop_detect = False
+        detection_thread = threading.Thread(target=detection_loop)
+        detection_thread.daemon = True
+        detection_thread.start()
+        return "Detection Started"
+    else:
+        return "detection already running"
+    
+@app.route('/stop')
+def stop_detection():
+    global stop_detect
+    stop_detect = True
+    return "request stop detection..."
+
 @app.route('/video_feed')
 def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    def generate():
+        placeholder = cv2.imencode('.jpg', np.zeros((480, 640, 3), dtype=np.uint8))[1].tobytes()
+        while True:
+            frame_to_send = latest_frame if latest_frame is not None else placeholder
+            yield (
+                b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' +
+                frame_to_send + 
+                b'\r\n'
+            )
+            time.sleep(0.1)
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame' )
 
 @app.route('/detection')
 def detection():

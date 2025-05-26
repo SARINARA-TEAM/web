@@ -60,6 +60,12 @@
             color: #555;
             margin: 0;
         }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -84,16 +90,14 @@
     <section class="video-section">
         <h2 style="text-align: center; margin-bottom: 10px;">REAL TIME MONITORING</h2>
         <div class="video-container">
-            <!-- <video id="cctv-video" controls autoplay muted>
-                <source src="{{ url_for('static', filename='video/cctv.mp4') }}" type="video/mp4">
-                Browser Anda tidak mendukung video tag ini.
-            </video> -->
             <img src="{{ url_for('video_feed') }}" width="640" height="480" />
-
-
         </div>
 
         <div class="hero">
+            <div class="info-bar">
+                <button onclick="startDetection()">Start Detection</button>
+                <button onclick="stopDetection()">Stop Detection</button>
+            </div>
             <div class="info-bar">
                 <div class="info-item" id="tanggal">📅 Tanggal</div>
                 <div class="info-item" id="waktu">📍 Waktu</div>
@@ -149,6 +153,22 @@
     </section>
 
     <script>
+        function startDetection() {
+            fetch('/start')
+            .then(res => res.text())
+            .then(data => {
+                alert(data);
+            });
+        }
+
+        function stopDetection() {
+            fetch('/stop')
+            .then(res => res.text())
+            .then(data => {
+                alert(data);
+            });
+        }
+
         function speakText() {
             const text = document.getElementById('text-to-speak').value;
             if (!text.trim()) {
