@@ -5,8 +5,8 @@ import tensorflow as tf
 
 # Load model Keras
 MODEL_PATH = 'models/mobilenetv2_binary_classifier8.h5'
-# MODEL_PATH = 'models/mobilenetv2.h5'
-# MODEL_PATH = 'models/resnet50v2.h5'
+# MODEL_PATH = 'models/mobilenetv2v.h5'
+# MODEL_PATH = 'models/resnet50v2v.h5'
 
 
 HAAR_CASCADE_PATH = 'models/haarcascade_frontalface_alt2.xml'

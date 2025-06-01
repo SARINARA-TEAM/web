@@ -5,6 +5,10 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.metrics import precision_score, recall_score
+from lime.lime_text import LimeTextExplainer
+import matplotlib.pyplot as plt
+import numpy as np
 import re
 import random
 
@@ -14,7 +18,7 @@ import random
 
 # custom stopwords
 custom_stopwords = {
-    "alo", "dok", "halo", "dokter",
+    "alo","Alo", "dok", "halo", "dokter",
     "selamat", "pagi" "siang", "sore", "malam",
     "terimakasih", "makasih", "hunnie",
     "alodokter", "hai", "salam", "hay", "doc",
@@ -131,14 +135,14 @@ custom_stopwords = {
 }
 
 custom_stopwords_phrases = {
-    "alo dok", "halo dok", "halo dokter", "alo dokter",
+    "alo dok", "halo dok", "halo dokter", "alo dokter", "raihan",
     "selamat pagi", "selamat siang", "selamat sore", "selamat malam",
     "mau tanya", "saya mau tanya", "dok mau tanya",
     "terimakasih", "terima kasih", "makasih", "mohon info",
     "mohon penjelasan", "izin bertanya", "saya ingin bertanya",
     "alo", "dok", "dokter", "halo", "hai", "hunnie","ingin tanya",
     "di alodokter", "terima kasih telah bertanya ke alodokter",
-    "terima kasih atas pertanyaannya", "Pagi bapak/ ibu dokter", "dok saya ingin konsultasi",
+    "terima kasih atas pertanyaannya","terimakasih atas pertanyaannya" "Pagi bapak/ ibu dokter", "dok saya ingin konsultasi",
     "Alodokter dok", "Saya mau konsultasi dok", "saya mau tanya", "aya mau tanya dok",
     "sy mau tanya", "slamat siang", "salam dok","salam sehat", "aya Angga umur 29 thn"
     "saya mau nanya", "Assalam wrb dok", "Ass Dokter", "Assalamuaakaikum dok", "Maaf dok nanya", "terima kasih ya sudah bertanya di Alodokter"
@@ -168,7 +172,7 @@ custom_stopwords_phrases = {
     "Saya dr. Ainul", "Terima kasih atas pertanyaannya untuk Alodokter", "Terima kasih atas pertanyaannya", "terimakasih sudah menghubungi alodokter", "terimakasih sudah menghubungi", "terimakasih ataspertanyaannya", "terimakasih sudah bertanya di AlodokterSaya", "terimakasih sudah bertanya", "Terima kasih telah bertanya kepada kami",
     "Terima kasih telah bertanya di alodokter", "Alo Saptaning", "Terima kasih sudah bertanya ke Alodokter", "Alo Shane", "terima kasih sudah bertanya", "Alo dikimaulana", "alo nathaael", "halo adam", "terimakasih sudah menghubungi alodokter", "alo acha", "Terima kasih telah bertanya ke Alodokter", "Terima kasih telah bertanya", "alo nafian",
     "alo eldison", "alo cachink", "terima kasih ya sudah bertanya", "halo nindya", "alo rosaria", "halo rama", "alo chelsy", "alo fajri", " terimakasih atas pertanyaan anda di Alodokter", " terimakasih atas pertanyaan anda", "alo restu", "alo denny", "alo muhammad", "hai elya", "alo habibi",
-    " terimakasih telah bertanya di Alodokter", " terimakasih telah bertanya", "alo rohmat", "salam alodokter", "alo kris", "terima kasih sudah bertanya pada Alodokter", "Selamat malam. Terimakasih sudah bertanya ke alodokter", "alo lydya", "alo haryanto", "Terima kasih telah berkonsultasi ke Alodokter", "Terima kasih telah berkonsultasi",
+    " terimakasih telah bertanya di Alodokter", " terimakasih telah bertanya", "alo rohmat", "salam alodokter", "alo kris", "terima kasih sudah bertanya pada Alodokter", "Selamat malam. Terimakasih sudah bertanya ke alodokter", "alo lydya", "alo haryanto", "Terima kasih telah berkonsultasi ke Alodokter", "Terima kasih telah berkonsultasi", 
     "halofauzi nugraha", " terima kasih telah bertanya pada Alodokter", " terima kasih telah bertanya", "hallo krisna", "terima kasih telah berkonsultasi dengan kami di web Alodokter.com", "terima kasih telah berkonsultasi dengan kami", "alo nur", "Perkenalkan saya dr.Rio", "kan menjawab pertanyaan yang anda berikan", "salam alodokter", "alo muslikh", "alo sifak", "alo ilham", "alo dhopi", "alo bajoll", "alo destina", " alo fauzanrez", "hello rinawati",
     "alo al", "Terimakasih telah menggunakan layanan konsultasi Alodokter", "Terimakasih telah menggunakan layanan konsultasi", "alo patma", "alo setiyo budi", "ao anggie", "hallo anita sari", "alo lala3030", "terima kasih sudah bertanya", "alo rengga", "alo heru", "alo mario", "alo proo", "alo iskandar azman tsuna", "alo ar sungli", "hallo sdr. deli ayu", "alo simon", "halo jihan", "alo lenny", "selamat pagi mason", "selamat pagi kenny", "alo bobby",
     "alo mutiara", "selamat malam samsul", "alo mr.xing", "alo blank", "alo stanley", "selamat pagi amara", "selamat siang bagas", "alo stanley", "alo viky", "alo handy", "alo juan", "Selamat sore, Fifie Gabriel, terima kasih ya sudah bertanya di Alodokter", "alo siska", "halo rizal mantovani", "alo astari", "halo fiki steeven", "selamat malam hiroshi hamada", "hai rejeki", "hallo miya", "hallo rangga", "halo stefanus renaldi", "hai ibnuwepe", "halo yanuar97",
@@ -184,7 +188,7 @@ custom_stopwords_phrases = {
     "dr. kresnawati setiono", "dr. yusi capriyanti", "dr. shirly widjaja", "dr. winda indriati", "dr. aditya prayoga", "dr. delvira parinding", "dr. irvandi", "dr. thoriqotil haqqul mauludiyah", "dr. rizki amy lavita", "dr. fenita antonius", "dr. muhammad fadhil", "dr. aldy valentino maehcarenda", "dr. nugraha arief", "dr. sonia loviarny", "dr. nurmarwiyah", "dr. wahyu febrianto", "dr. christian haryanto junaedi",
     "dr. adriana virani jeumpa", "dr. alyssa diandra", "dr. radius kusuma", "dr. celleen rei setiawan", "dr. jati satriyo", "dr. taneya putri zahra", "dr. muliani sukiman", "dr. yuniar cahyania intani", "dr. sylvia djohan", "dr. adhi pasha", "dr. theresia yoshiana", "dr. natasha alexander", "dr. ellysabet dian", "dr. prasetyo", "dr. anthony maleachi", "dr. paramita, m.biomed", "dr. caecilia haryu aryapti",
     "dr. atikah dafri", "dr. tantya marlien", "dr. yoni cahyati", "dr. annisa auli adjani", "dr. lili dwiyani", "dr. rony wijaya", "dr. annes waren", "dr. andika surya atmadja", "dr. luh putu prevyanti", "dr. yosephine. s.", "dr. siti rahmayanti", "dr. deslia anggarini supriyadi", "dr. tri permatadewi", "dr. mesha syafitra", "dr. mira iskandar", "dr. otniel budi krisetya", "dr. nugraha mauluddin", "dr. debby phanggestu",
-    "dr. rico n", "dr. agatha dinar", "dr. rievia bahasoean", "dr. tessi ananditya", "dr. nisia putri rinayu", "dr. eunike kiki m. sitompul", "dr. f. sutandi", "dr. andisty ate", "dr. aldo ferly", "dr. aditya pratama", "dr. nofrina", "dr. agnes maureen", "dr. dian paramitasari", "dr. lina saleh", "dr. henry andrean", "dr. jessica winoto", "dr. nadia nurotul fuadah", "dr. tri", "dr. liyadi", "dr. debby phanggestu", "dr. yusi", "dr. dian paramitasari",
+    "dr. rico n", "dr. agatha dinar", "dr. rievia bahasoean", "dr. tessi ananditya", "dr. nisia putri rinayu", "dr. eunike kiki m. sitompul", "dr. f. sutandi", "dr. andisty ate", "dr. aldo ferly", "dr. aditya pratama", "dr. nofrina", "dr. agnes maureen", "dr. dian paramitasari", "dr. lina saleh", "dr. henry andrean", "dr. jessica winoto", "dr. nadia nurotul fuadah", "dr. tri", "dr. liyadi", "dr. debby phanggestu", "dr. yusi", "dr. dian paramitasari", "telah bertanya ke",
     "Dian Paramitasari", "dr. agatha", "dr. yan william", "dr. nofrina", "dr. yusi", "dr. jessica winoto", "dr. agnes maureen", "dian paramitasari dr", "ke ter",
     "dr. yan william", "dr. radius kusuma", "dr. rievia", "dr. miranti iskandar", "dr. debby phanggestu", "dr. yosephine", "dr. aditya pratama", "dr. jessica", "dr. rony wijaya", "dr. yusi", "dr. jessica winoto", "dr. muliani", "dr. yusi", "dr. agatha", "dr. yosephine", "dr. radius kusuma", "dr. muliani sukiman", "dr. dennis jacobus", "dr. debby phanggestu", "dr. miranti iskandar", "dr. rievia", "dr. anandia salsabila", "dr. yan william",
     "dr. otniel budi krisetya", "dr. andika surya", "dr. yusi", "dr. aldo", "dr. nugraha mauluddin", "dr. yosephine", "dr. aditya pratama", "dr. jati satriyo", "dr. debby phanggestu", "dr. tantya marlien", "dr. muliani sukiman", "dr. anandia salsabila", "dr. yan william", "dr. otniel budi krisetya", "dr. andika surya", "dr. yusi", "dr. aldo", "dr. nugraha mauluddin", "dr. yosephine", "dr. aditya pratama", "dr. jati satriyo", "dr. debby phanggestu",
@@ -206,7 +210,6 @@ def preprocess(text):
     
     text = text.lower()
     
-    
     for phrase in custom_stopwords_phrases:
         text = text.replace(phrase.lower(), '')
 
@@ -217,19 +220,35 @@ def preprocess(text):
     tokens = [word for word in tokens if word not in custom_stopwords]
     return " ".join(tokens)
 
+def clean_answer(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.lower()
+    
+    for phrase in custom_stopwords_phrases:
+        text = re.sub(re.escape(phrase), '', text, flags=re.IGNORECASE)
+
+    text = re.sub(r'[^a-zA-Z0-9\s.,]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    text = re.sub(r'([.,])\s*([.,])+', r'\1', text)
+
+    sentences = [s.strip().capitalize() for s in text.split('.') if s.strip()]
+    text = '. '.join(sentences) + '.' if sentences else ''
+    return text
+
 # read dataset
 df = pd.read_csv('static/assets/cleaned_data_qna.csv', encoding='utf-8')
 df.dropna(subset=['Member Topic Content','Doctor Content'], inplace=True)
 
 # Preprocess question and answer
 df['processed_member_topic_content'] = df['Member Topic Content'].apply(preprocess)
-df['processed_doctor_content'] = df['Doctor Content'].apply(preprocess)
+df['processed_doctor_content'] = df['Doctor Content'].apply(clean_answer)
 
 # TF-IDF dan vektor
 vectorizer = TfidfVectorizer()
 question_vectors = vectorizer.fit_transform(df['processed_member_topic_content'])
 
-def get_answer(user_input, threshold=0.6):
+def get_answer(user_input, threshold=0.55):
     preprocessed_input = preprocess(user_input)
     user_vector = vectorizer.transform([preprocessed_input])
     similarities = cosine_similarity(user_vector, question_vectors)
@@ -263,3 +282,120 @@ def get_answer(user_input, threshold=0.6):
     print(f"answer: {answer}\n")
 
     return answer
+
+test_questions = [
+    ("bagaimana caranya berhenti merokok?", 448),
+    ("apakah pod baik digunakan sebagai pengganti rokok?", 2),
+    ("apakah rokok elektrik aman ?", 607),
+    ("Mana yang lebih berbahaya, vape atau rokok biasa?",399),
+    ("Dok, kenapa tenggorokan dan napas saya terasa panas selama hampir sebulan ini? Pernah kambuh sebelumnya, tapi sekarang muncul lagi. Apakah ini bisa terkait kebiasaan merokok? Bagaimana solusinya?", 13),
+    ("apakah rokok sangat berpengaruh untuk orang yang menderita penyakit ginjal?", 111),
+    ("apakah bahaya memcium bau rokok yang belum di bakar?", 136),
+    ("apa dampaknya jika anak di bawah 2 tahun sering terpapar asap rokok", 378),
+    ("jika seseorang melakukan vaping selama sekitar 1 tahun dan hanya sekali menghirup cerutu dalam sebulan terakhir, apakah hasil rontgen dada (thorax) akan tampak sama seperti perokok aktif?", 453),
+    ("Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok? ", 625),
+    
+    ("Kenapa saat saya merokok dan bahkan hanya menghirup asap rokok teman yang sedang merokok, kepala saya suka jadi pusing terus suka mual dan ingin muntah serta badan lemas dan tubuh menjadi lebih dingin?", 589),
+    ("kenapa tenggorokan saya selalu memproduksi dahak? bahkan selesai sikat gigi, dahak saya selalu ada",301),
+    ("apakah vapor lebih berbahaya daripada rokok biasa? ", 583),
+    ("bahaya atau efek samping menghirup rokok elektrik bagi kesehatan dan apakah sama dengan rokok biasa?", 644),
+    ("cara membersihkan paru-paru dari zat kuning atau asap yang masih menempel di paru-paru?", 405),
+    ("Apakah merokok dapat menyebabkan kulit gatal-gatal?", 470),
+    ("Apakah rokok sangat berpengaruh untuk orang yang menderita penyakit ginjal?", 111),
+    ("Apakah efek dari merokok dan minum alkohol bisa terdeteksi dalam tes urine?", 200),
+    ("Bagaimana cara menghilangkan bekas merokok di paru-paru agar lulus tes rontgen?", 718),
+    ("Apakah rokok elektrik atau cairannya bisa menyebabkan kemandulan? ", 605)
+]
+
+#fungsi evaluasi threshold optimal
+def evaluate_threshold(threshold):
+    y_true = []
+    y_pred = []
+
+    for question, true_index in test_questions:
+        preprocessed_input = preprocess(question)
+        user_vector = vectorizer.transform([preprocessed_input])
+        similarities = cosine_similarity(user_vector, question_vectors).flatten()
+
+        best_match_index = similarities.argmax()
+        best_score = similarities[best_match_index]
+
+        is_answered = best_score >= threshold
+        is_correct = (best_match_index == true_index)
+
+        y_true.append(is_correct)
+        y_pred.append(is_answered and is_correct)
+
+    precision = precision_score(y_true, y_pred, zero_division=0)
+    recall = recall_score(y_true, y_pred, zero_division=0)
+
+    return precision, recall
+
+thresholds = np.arange(0.1, 1.0, 0.05)
+results = []
+
+for t in thresholds:
+    precision, recall = evaluate_threshold(t)
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    results.append({
+        'threshold': round(t, 2),
+        'precision': round(precision, 4),
+        'recall': round(recall, 4),
+        'f1': round(f1, 4)
+    })
+
+result_df = pd.DataFrame(results)
+print(result_df.sort_values(by='f1', ascending=False))
+
+#visualisasi threshold optiomal
+plt.figure(figsize=(10,6))
+plt.plot(result_df['threshold'], result_df['precision'], label='Precision')
+plt.plot(result_df['threshold'], result_df['recall'], label='Recall')
+plt.plot(result_df['threshold'], result_df['f1'], label='F1 Score')
+plt.xlabel('Threshold')
+plt.ylabel('Score')
+plt.title('Evaluasi Threshold Cosine Similarity')
+plt.legend()
+plt.grid(True)
+plt.savefig("threshold_cosine_similarity.png")
+
+
+# Fungsi dummy simulasi probabilitas dua kelas
+def predict_proba(texts):
+    results = []
+    for text in texts:
+        preprocessed = preprocess(text)
+        vec = vectorizer.transform([preprocessed])
+        sim = cosine_similarity(vec, question_vectors).flatten()
+        relevant_score = np.max(sim)
+        irrelevant_score = 1 - relevant_score
+        results.append([irrelevant_score, relevant_score])
+    return np.array(results)
+
+# explainable kenapa jawaban dipilih berdasarkan input user
+def explain_answer_with_lime(user_input, num_features=6):
+    explainer = LimeTextExplainer(class_names=['Tidak Relevan', 'Relevan'])
+
+    explanation = explainer.explain_instance(
+        user_input,
+        predict_proba,
+        num_features=num_features,
+        num_samples=500
+    )
+
+    print("Visualisasi Kata Kunci:")
+    print(explanation.as_list())
+
+    # Simpan hasil penjelasan
+    html_explanation = explanation.as_html()
+    with open("lime_explanation.html", "w", encoding="utf-8") as f:
+        f.write(html_explanation)
+    print("Penjelasan LIME disimpan di: lime_explanation.html")
+    return html_explanation
+
+user_input = "Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok?"
+answer = get_answer(user_input)
+print("Jawaban:")
+print(answer)
+
+explain_answer_with_lime(user_input)

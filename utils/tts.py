@@ -14,6 +14,8 @@ def speak(text):
 
     def run():
         engine = pyttsx3.init()
+        engine.setProperty('rate', 130)
+        engine.setProperty('volume', 0.9)
         with lock:
             try:
                 engine.say(text)
