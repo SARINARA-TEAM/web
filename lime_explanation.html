@@ -37089,10 +37089,10 @@
 /***/ })
 /******/ ]);
 //# sourceMappingURL=bundle.js.map </script></head><body>
-        <div class="lime top_div" id="top_divQPZVE739WV7Q7FX"></div>
+        <div class="lime top_div" id="top_divD1H57UYL6AK5DSB"></div>
         
         <script>
-        var top_div = d3.select('#top_divQPZVE739WV7Q7FX').classed('lime top_div', true);
+        var top_div = d3.select('#top_divD1H57UYL6AK5DSB').classed('lime top_div', true);
         
             var pp_div = top_div.append('div')
                                 .classed('lime predict_proba', true);
@@ -37104,10 +37104,10 @@
             var exp = new lime.Explanation(["Tidak Relevan", "Relevan"]);
         
                 exp_div = top_div.append('div').classed('lime explanation', true);
-                exp.show([["rokok", 0.09746522845878522], ["bahaya", 0.08154179319148952], ["tembakau", -0.061733458601016464], ["mau", 0.017161680605536668], ["saya", -0.016001137758593607], ["tanya", 0.01509405826562348]], 1, exp_div);
+                exp.show([["rokok", 0.11411728227736057], ["bahaya", 0.07950478354212578], ["elektrik", 0.03946969093083752], ["tembakau", -0.028991549259146362], ["Dok", -0.01894278181610251], ["tanya", -0.009027456801362632]], 1, exp_div);
                 
         var raw_div = top_div.append('div');
-            exp.show_raw_text([["rokok", 38, 0.09746522845878522], ["rokok", 58, 0.09746522845878522], ["bahaya", 26, 0.08154179319148952], ["tembakau", 64, -0.061733458601016464], ["mau", 10, 0.017161680605536668], ["saya", 5, -0.016001137758593607], ["tanya", 14, 0.01509405826562348]], 1, "Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok?", raw_div, true);
+            exp.show_raw_text([["rokok", 38, 0.11411728227736057], ["rokok", 58, 0.11411728227736057], ["bahaya", 26, 0.07950478354212578], ["elektrik", 44, 0.03946969093083752], ["tembakau", 64, -0.028991549259146362], ["Dok", 0, -0.01894278181610251], ["tanya", 14, -0.009027456801362632]], 1, "Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok?", raw_div, true);
             
         </script>
         </body></html>

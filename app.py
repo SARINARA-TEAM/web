@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, Response, request
+from flask import Flask, render_template, jsonify, Response, request, redirect
 from chatbot_engine import get_answer
 import cv2
 from detect import process_frame
@@ -6,51 +6,97 @@ from utils.tts import speak
 import time
 import threading
 import numpy as np
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+import os
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///detections.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+UPLOAD_FOLDER = 'static/detections'
+os.makedirs(UPLOAD_FOLDER,exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+class Detection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    image_path = db.Column(db.String(255), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    label = db.Column(db.String(50), nullable=False)
+
+with app.app_context():
+    db.create_all()
 
 # Status global
 stop_detect = False
 latest_frame = None
 latest_status = {"label": None}
 last_tts_time = 0
+last_save_time = 0
 
 def detection_loop():
-    global latest_status, last_tts_time, latest_frame, stop_detect
-    cap = cv2.VideoCapture(0)
-    # cap = cv2.VideoCapture(r"http://192.168.1.7:81/stream", cv2.CAP_FFMPEG)  # URL kamera ESP32-CAM http://192.168.1.1:81/stream
+    global latest_status, last_tts_time, latest_frame, stop_detect, last_save_time
 
-    if not cap.isOpened():
-        print("Kamera tidak bisa dibuka!")
-        return
-        
-    print("Kamera berhasil dibuka")
+    with app.app_context():
 
-    while not stop_detect:
-        success, frame = cap.read()
-        if not success:
-            print("Gagal baca frame dari kamera")
-            break
+        cap = cv2.VideoCapture(0)
+        # cap = cv2.VideoCapture(r"http://192.168.1.7:81/stream", cv2.CAP_FFMPEG)  # URL kamera ESP32-CAM http://192.168.1.1:81/stream
+
+        if not cap.isOpened():
+            print("Kamera tidak bisa dibuka!")
+            return
             
-        try: 
-            detected_frame, label = process_frame(frame)
-            latest_status["label"] = label
-            
-            current_time = time.time()
-            if label == "smoking" and (current_time - last_tts_time) > 10:
-                threading.Thread(target=speak, args=("smoking detected, don't smoking in this area!",)).start()
-                last_tts_time = current_time
-            else:
-                pass
+        print("Kamera berhasil dibuka")
 
-            ret, buffer = cv2.imencode('.jpg', detected_frame)
-            latest_frame = buffer.tobytes()
+        while not stop_detect:
+            success, frame = cap.read()
+            if not success:
+                print("Gagal baca frame dari kamera")
+                break
+                
+            try: 
+                detected_frame, label = process_frame(frame)
+                latest_status["label"] = label
+                
+                if label == "smoking":
+                    current_time = time.time()
+                    
+                    #trigger sound
+                    if current_time - last_tts_time > 10:
+                        threading.Thread(target=speak, args=("smoking detected, don't smoking in this area!",)).start()
+                        last_tts_time = current_time
 
-        except Exception as e:
-            print(f"Error detection_loop {e}")
-    cap.release()
-    print("camera released and detection stopped.")
+                    #save detections
+                    if current_time - last_save_time > 30:
+                    
+                        timestamp = datetime.now()
+                        filename = f"{timestamp.strftime('%Y%m%d_%H%M%S')}.jpg"
+                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+                        cv2.imwrite(filepath, detected_frame)
+                        new_detection = Detection(
+                            image_path=filename,
+                            date=timestamp.date(),
+                            time=timestamp.time(),
+                            label=label
+                        )
+                        db.session.add(new_detection)
+                        db.session.commit()
+                        last_save_time = current_time
+                    
+                else:
+                    pass
+
+                ret, buffer = cv2.imencode('.jpg', detected_frame)
+                latest_frame = buffer.tobytes()
+
+            except Exception as e:
+                print(f"Error detection_loop {e}")
+        cap.release()
+        print("camera released and detection stopped.")
 
 detection_thread = None
 
@@ -94,6 +140,28 @@ def video_feed():
 @app.route('/detection')
 def detection():
     return render_template('detection.html')
+
+@app.route('/history')
+def detection_history():
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    paginated = Detection.query.filter_by(label="smoking").paginate(page=page, per_page=per_page)
+    return render_template('history.html', detections=paginated)
+
+@app.route('/history/delete/<int:detection_id>', methods=['POST'])
+def delete_detection(detection_id):
+    detection = Detection.query.get_or_404(detection_id)
+    
+    # Hapus file gambar dari direktori
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], detection.image_path)
+    if os.path.exists(image_path):
+        os.remove(image_path)
+    
+    # Hapus dari database
+    db.session.delete(detection)
+    db.session.commit()
+
+    return redirect('/history')
 
 @app.route('/kluster')
 def kluster():

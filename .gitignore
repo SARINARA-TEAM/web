@@ -1,3 +1,6 @@
 __pycache__
-
+instance
+detections
 v_web
+threshold_cosine_similarity.png
+lime_explanation.html
