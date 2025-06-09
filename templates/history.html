@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -61,8 +62,21 @@
             background-color: #aaa;
             cursor: not-allowed;
         }
+
+        .btn.disabled {
+            background-color: #ccc;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .btn-secondary.disabled {
+            background-color: #ddd;
+            color: #666;
+            cursor: default;
+        }
     </style>
 </head>
+
 <body>
     <!-- Header -->
     <header>
@@ -85,10 +99,6 @@
         <h2 style="text-align: center; margin-bottom: 10px">
             History Deteksi Smoking
         </h2>
-
-        {% set page = request.args.get('page', 1) | int %} {% set per_page = 5 %}
-        {% set offset = (page - 1) * per_page %}
-
         <div class="table-container">
             <table>
                 <thead>
@@ -103,7 +113,7 @@
                 <tbody>
                     {% for detection in detections.items %}
                     <tr>
-                        <td>{{ offset + loop.index }}</td>
+                        <td>{{ loop.index + ((detections.page - 1) * detections.per_page) }}</td>
                         <td>
                             <img src="/static/detections/{{ detection.image_path }}" alt="Gambar" />
                         </td>
@@ -124,13 +134,32 @@
         </div>
 
         <div class="pagination">
-            {% for page_num in detections.iter_pages() %} {% if page_num %} {% if
-            page_num == page %}
+            {% if detections.has_prev %}
+            <a class="btn btn-primary" href="{{ url_for('detection_history', page=detections.prev_num) }}">&laquo;
+                Prev</a>
+            {% else %}
+            <a class="btn btn-primary disabled" href="#">&laquo; Prev</a>
+            {% endif %}
+
+            {% for page_num in detections.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+            {% if page_num %}
+            {% if page_num == detections.page %}
             <a class="btn btn-primary disabled" href="{{ url_for('detection_history', page=page_num) }}">{{ page_num
                 }}</a>
+            {% elif page_num == '...' %}
+            <span class="btn btn-secondary disabled">...</span>
             {% else %}
             <a class="btn btn-primary" href="{{ url_for('detection_history', page=page_num) }}">{{ page_num }}</a>
-            {% endif %} {% endif %} {% endfor %}
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+
+            {% if detections.has_next %}
+            <a class="btn btn-primary" href="{{ url_for('detection_history', page=detections.next_num) }}">Next
+                &raquo;</a>
+            {% else %}
+            <a class="btn btn-primary disabled" href="#">Next &raquo;</a>
+            {% endif %}
         </div>
     </main>
 
@@ -141,4 +170,5 @@
         </div>
     </footer>
 </body>
+
 </html>

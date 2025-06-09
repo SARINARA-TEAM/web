@@ -64,7 +64,7 @@
       <!-- Chat Container -->
       <div class="chat-container" id="chatbot">
         <div class="chat-header">
-          Chat with Us
+          Chatting with Bot
           <span class="close-btn" onclick="toggleChat()">×</span>
         </div>
         <div class="chat-box" id="chat-box"></div>
@@ -90,10 +90,28 @@
 
     <!-- Script -->
     <script>
+      let welcomeMessageSent = false;
+      
+      function sendWelcomeMessage() {
+        let chatBox = document.getElementById("chat-box");
+        //pesan bot
+        let botBubble = document.createElement("div");
+        botBubble.className = "bubble bot-bubble";
+        botBubble.innerText = "Halo! saya adalah chatbot yang memiliki pengetahuan seputar kesehatan dan rokok, silahkan bertanya, saya akan menjawab pertanyaan yang saya ketahui.";
+        chatBox.appendChild(botBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
       function toggleChat() {
         const chatBox = document.getElementById("chatbot");
         if (chatBox.style.display === "none" || chatBox.style.display === "") {
           chatBox.style.display = "flex";
+          if (!welcomeMessageSent) {
+            setTimeout(()=> {
+              sendWelcomeMessage();
+              welcomeMessageSent = true;
+            }, 1000);
+          }
         } else {
           chatBox.style.display = "none";
         }

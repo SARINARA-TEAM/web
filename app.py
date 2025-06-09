@@ -43,6 +43,8 @@ def detection_loop():
     with app.app_context():
 
         cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         # cap = cv2.VideoCapture(r"http://192.168.1.7:81/stream", cv2.CAP_FFMPEG)  # URL kamera ESP32-CAM http://192.168.1.1:81/stream
 
         if not cap.isOpened():
@@ -50,6 +52,7 @@ def detection_loop():
             return
             
         print("Kamera berhasil dibuka")
+        frame_counter = 0
 
         while not stop_detect:
             success, frame = cap.read()
@@ -58,6 +61,10 @@ def detection_loop():
                 break
                 
             try: 
+                frameSkipFactor = 3 # use every 3 frame
+                frame_counter += 1
+                if frame_counter % frameSkipFactor != 0:
+                    continue
                 detected_frame, label = process_frame(frame)
                 latest_status["label"] = label
                 
@@ -71,20 +78,7 @@ def detection_loop():
 
                     #save detections
                     if current_time - last_save_time > 30:
-                    
-                        timestamp = datetime.now()
-                        filename = f"{timestamp.strftime('%Y%m%d_%H%M%S')}.jpg"
-                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-                        cv2.imwrite(filepath, detected_frame)
-                        new_detection = Detection(
-                            image_path=filename,
-                            date=timestamp.date(),
-                            time=timestamp.time(),
-                            label=label
-                        )
-                        db.session.add(new_detection)
-                        db.session.commit()
+                        threading.Thread(target=save_detection, args=(detected_frame, db, app.config['UPLOAD_FOLDER'])).start()
                         last_save_time = current_time
                     
                 else:
@@ -134,18 +128,37 @@ def video_feed():
                 frame_to_send + 
                 b'\r\n'
             )
-            time.sleep(0.1)
+            time.sleep(0.05)
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame' )
 
 @app.route('/detection')
 def detection():
     return render_template('detection.html')
 
+def save_detection(frame, db_instance, upload_folder):
+    try:
+        timestamp = datetime.now()
+        filename = f"{timestamp.strftime('%Y%m%d_%H%M%S')}.jpg"
+        filepath = os.path.join(upload_folder, filename)
+        cv2.imwrite(filepath, frame)
+
+        with app.app_context():
+            new_detection = Detection(
+                image_path=filename,
+                date=timestamp.date(),
+                time=timestamp.time(),
+                label="smoking"
+            )
+            db_instance.session.add(new_detection)
+            db_instance.session.commit()
+    except Exception as e:
+        print(f"Error saving detection: {e}")
+
 @app.route('/history')
 def detection_history():
     page = request.args.get('page', 1, type=int)
     per_page = 5
-    paginated = Detection.query.filter_by(label="smoking").paginate(page=page, per_page=per_page)
+    paginated = Detection.query.filter_by(label="smoking").order_by(Detection.id.desc()).paginate(page=page, per_page=per_page)
     return render_template('history.html', detections=paginated)
 
 @app.route('/history/delete/<int:detection_id>', methods=['POST'])

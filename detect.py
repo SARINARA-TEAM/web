@@ -3,10 +3,11 @@ import numpy as np
 from tensorflow.keras.models import load_model
 import tensorflow as tf
 
-# Load model Keras
+# Load model
 MODEL_PATH = 'models/mobilenetv2_binary_classifier8.h5'
-# MODEL_PATH = 'models/mobilenetv2v.h5'
-# MODEL_PATH = 'models/resnet50v2v.h5'
+# MODEL_PATH = 'models/mobilenetv2(1).h5'
+# MODEL_PATH = 'models/mobilenetv2cll1.h5'
+# MODEL_PATH = 'models/mobilenetv2cll2.h5'
 
 
 HAAR_CASCADE_PATH = 'models/haarcascade_frontalface_alt2.xml'
@@ -23,12 +24,12 @@ except Exception as e:
     raise ValueError(f"Gagal memuat model: {e}")
 
 def process_frame(frame):
-    # Salin frame untuk pengolahan
+    # Salin frame untuk proses
     output_frame = frame.copy()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # Deteksi tubuh
-    bodies = body_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(60, 60))
+    bodies = body_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=3, minSize=(100, 100))
 
     label = None
 

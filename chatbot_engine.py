@@ -269,133 +269,133 @@ def get_answer(user_input, threshold=0.55):
     answer = df.iloc[best_match_index]['processed_doctor_content']
 
 # explainable chat
-    matched_question = df.iloc[best_match_index]['processed_member_topic_content']
-    feature_name = vectorizer.get_feature_names_out()
-    non_zero_weight = user_vector.toarray()[0]
-    keyword_used = {
-        feature_name[i]: round(non_zero_weight[i], 4)
-        for i in non_zero_weight.nonzero()[0]
-    }
-    print(f"Input Keywords : {keyword_used}\n")
-    print(f"mached_question: {matched_question}\n")
-    print(f"similarity score: {best_score:.4f}\n")
-    print(f"answer: {answer}\n")
+    # matched_question = df.iloc[best_match_index]['processed_member_topic_content']
+    # feature_name = vectorizer.get_feature_names_out()
+    # non_zero_weight = user_vector.toarray()[0]
+    # keyword_used = {
+    #     feature_name[i]: round(non_zero_weight[i], 4)
+    #     for i in non_zero_weight.nonzero()[0]
+    # }
+    # print(f"Input Keywords : {keyword_used}\n")
+    # print(f"mached_question: {matched_question}\n")
+    # print(f"similarity score: {best_score:.4f}\n")
+    # print(f"answer: {answer}\n")
 
     return answer
 
-test_questions = [
-    ("bagaimana caranya berhenti merokok?", 448),
-    ("apakah pod baik digunakan sebagai pengganti rokok?", 2),
-    ("apakah rokok elektrik aman ?", 607),
-    ("Mana yang lebih berbahaya, vape atau rokok biasa?",399),
-    ("Dok, kenapa tenggorokan dan napas saya terasa panas selama hampir sebulan ini? Pernah kambuh sebelumnya, tapi sekarang muncul lagi. Apakah ini bisa terkait kebiasaan merokok? Bagaimana solusinya?", 13),
-    ("apakah rokok sangat berpengaruh untuk orang yang menderita penyakit ginjal?", 111),
-    ("apakah bahaya memcium bau rokok yang belum di bakar?", 136),
-    ("apa dampaknya jika anak di bawah 2 tahun sering terpapar asap rokok", 378),
-    ("jika seseorang melakukan vaping selama sekitar 1 tahun dan hanya sekali menghirup cerutu dalam sebulan terakhir, apakah hasil rontgen dada (thorax) akan tampak sama seperti perokok aktif?", 453),
-    ("Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok? ", 625),
+# test_questions = [
+#     ("bagaimana caranya berhenti merokok?", 448),
+#     ("apakah pod baik digunakan sebagai pengganti rokok?", 2),
+#     ("apakah rokok elektrik aman ?", 607),
+#     ("Mana yang lebih berbahaya, vape atau rokok biasa?",399),
+#     ("Dok, kenapa tenggorokan dan napas saya terasa panas selama hampir sebulan ini? Pernah kambuh sebelumnya, tapi sekarang muncul lagi. Apakah ini bisa terkait kebiasaan merokok? Bagaimana solusinya?", 13),
+#     ("apakah rokok sangat berpengaruh untuk orang yang menderita penyakit ginjal?", 111),
+#     ("apakah bahaya memcium bau rokok yang belum di bakar?", 136),
+#     ("apa dampaknya jika anak di bawah 2 tahun sering terpapar asap rokok", 378),
+#     ("jika seseorang melakukan vaping selama sekitar 1 tahun dan hanya sekali menghirup cerutu dalam sebulan terakhir, apakah hasil rontgen dada (thorax) akan tampak sama seperti perokok aktif?", 453),
+#     ("Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok? ", 625),
     
-    ("Kenapa saat saya merokok dan bahkan hanya menghirup asap rokok teman yang sedang merokok, kepala saya suka jadi pusing terus suka mual dan ingin muntah serta badan lemas dan tubuh menjadi lebih dingin?", 589),
-    ("kenapa tenggorokan saya selalu memproduksi dahak? bahkan selesai sikat gigi, dahak saya selalu ada",301),
-    ("apakah vapor lebih berbahaya daripada rokok biasa? ", 583),
-    ("bahaya atau efek samping menghirup rokok elektrik bagi kesehatan dan apakah sama dengan rokok biasa?", 644),
-    ("cara membersihkan paru-paru dari zat kuning atau asap yang masih menempel di paru-paru?", 405),
-    ("Apakah merokok dapat menyebabkan kulit gatal-gatal?", 470),
-    ("Apakah rokok sangat berpengaruh untuk orang yang menderita penyakit ginjal?", 111),
-    ("Apakah efek dari merokok dan minum alkohol bisa terdeteksi dalam tes urine?", 200),
-    ("Bagaimana cara menghilangkan bekas merokok di paru-paru agar lulus tes rontgen?", 718),
-    ("Apakah rokok elektrik atau cairannya bisa menyebabkan kemandulan? ", 605)
-]
+#     ("Kenapa saat saya merokok dan bahkan hanya menghirup asap rokok teman yang sedang merokok, kepala saya suka jadi pusing terus suka mual dan ingin muntah serta badan lemas dan tubuh menjadi lebih dingin?", 589),
+#     ("kenapa tenggorokan saya selalu memproduksi dahak? bahkan selesai sikat gigi, dahak saya selalu ada",301),
+#     ("apakah vapor lebih berbahaya daripada rokok biasa? ", 583),
+#     ("bahaya atau efek samping menghirup rokok elektrik bagi kesehatan dan apakah sama dengan rokok biasa?", 644),
+#     ("cara membersihkan paru-paru dari zat kuning atau asap yang masih menempel di paru-paru?", 405),
+#     ("Apakah merokok dapat menyebabkan kulit gatal-gatal?", 470),
+#     ("Apakah rokok sangat berpengaruh untuk orang yang menderita penyakit ginjal?", 111),
+#     ("Apakah efek dari merokok dan minum alkohol bisa terdeteksi dalam tes urine?", 200),
+#     ("Bagaimana cara menghilangkan bekas merokok di paru-paru agar lulus tes rontgen?", 718),
+#     ("Apakah rokok elektrik atau cairannya bisa menyebabkan kemandulan? ", 605)
+# ]
 
-#fungsi evaluasi threshold optimal
-def evaluate_threshold(threshold):
-    y_true = []
-    y_pred = []
+# #fungsi evaluasi threshold optimal
+# def evaluate_threshold(threshold):
+#     y_true = []
+#     y_pred = []
 
-    for question, true_index in test_questions:
-        preprocessed_input = preprocess(question)
-        user_vector = vectorizer.transform([preprocessed_input])
-        similarities = cosine_similarity(user_vector, question_vectors).flatten()
+#     for question, true_index in test_questions:
+#         preprocessed_input = preprocess(question)
+#         user_vector = vectorizer.transform([preprocessed_input])
+#         similarities = cosine_similarity(user_vector, question_vectors).flatten()
 
-        best_match_index = similarities.argmax()
-        best_score = similarities[best_match_index]
+#         best_match_index = similarities.argmax()
+#         best_score = similarities[best_match_index]
 
-        is_answered = best_score >= threshold
-        is_correct = (best_match_index == true_index)
+#         is_answered = best_score >= threshold
+#         is_correct = (best_match_index == true_index)
 
-        y_true.append(is_correct)
-        y_pred.append(is_answered and is_correct)
+#         y_true.append(is_correct)
+#         y_pred.append(is_answered and is_correct)
 
-    precision = precision_score(y_true, y_pred, zero_division=0)
-    recall = recall_score(y_true, y_pred, zero_division=0)
+#     precision = precision_score(y_true, y_pred, zero_division=0)
+#     recall = recall_score(y_true, y_pred, zero_division=0)
 
-    return precision, recall
+#     return precision, recall
 
-thresholds = np.arange(0.1, 1.0, 0.05)
-results = []
+# thresholds = np.arange(0.1, 1.0, 0.05)
+# results = []
 
-for t in thresholds:
-    precision, recall = evaluate_threshold(t)
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-    results.append({
-        'threshold': round(t, 2),
-        'precision': round(precision, 4),
-        'recall': round(recall, 4),
-        'f1': round(f1, 4)
-    })
+# for t in thresholds:
+#     precision, recall = evaluate_threshold(t)
+#     f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+#     results.append({
+#         'threshold': round(t, 2),
+#         'precision': round(precision, 4),
+#         'recall': round(recall, 4),
+#         'f1': round(f1, 4)
+#     })
 
-result_df = pd.DataFrame(results)
-print(result_df.sort_values(by='f1', ascending=False))
+# result_df = pd.DataFrame(results)
+# print(result_df.sort_values(by='f1', ascending=False))
 
-#visualisasi threshold optiomal
-plt.figure(figsize=(10,6))
-plt.plot(result_df['threshold'], result_df['precision'], label='Precision')
-plt.plot(result_df['threshold'], result_df['recall'], label='Recall')
-plt.plot(result_df['threshold'], result_df['f1'], label='F1 Score')
-plt.xlabel('Threshold')
-plt.ylabel('Score')
-plt.title('Evaluasi Threshold Cosine Similarity')
-plt.legend()
-plt.grid(True)
-plt.savefig("threshold_cosine_similarity.png")
+# #visualisasi threshold optiomal
+# plt.figure(figsize=(10,6))
+# plt.plot(result_df['threshold'], result_df['precision'], label='Precision')
+# plt.plot(result_df['threshold'], result_df['recall'], label='Recall')
+# plt.plot(result_df['threshold'], result_df['f1'], label='F1 Score')
+# plt.xlabel('Threshold')
+# plt.ylabel('Score')
+# plt.title('Evaluasi Threshold Cosine Similarity')
+# plt.legend()
+# plt.grid(True)
+# plt.savefig("threshold_cosine_similarity.png")
 
 
-# Fungsi dummy simulasi probabilitas dua kelas
-def predict_proba(texts):
-    results = []
-    for text in texts:
-        preprocessed = preprocess(text)
-        vec = vectorizer.transform([preprocessed])
-        sim = cosine_similarity(vec, question_vectors).flatten()
-        relevant_score = np.max(sim)
-        irrelevant_score = 1 - relevant_score
-        results.append([irrelevant_score, relevant_score])
-    return np.array(results)
+# # Fungsi dummy simulasi probabilitas dua kelas
+# def predict_proba(texts):
+#     results = []
+#     for text in texts:
+#         preprocessed = preprocess(text)
+#         vec = vectorizer.transform([preprocessed])
+#         sim = cosine_similarity(vec, question_vectors).flatten()
+#         relevant_score = np.max(sim)
+#         irrelevant_score = 1 - relevant_score
+#         results.append([irrelevant_score, relevant_score])
+#     return np.array(results)
 
-# explainable kenapa jawaban dipilih berdasarkan input user
-def explain_answer_with_lime(user_input, num_features=6):
-    explainer = LimeTextExplainer(class_names=['Tidak Relevan', 'Relevan'])
+# # explainable kenapa jawaban dipilih berdasarkan input user
+# def explain_answer_with_lime(user_input, num_features=6):
+#     explainer = LimeTextExplainer(class_names=['Tidak Relevan', 'Relevan'])
 
-    explanation = explainer.explain_instance(
-        user_input,
-        predict_proba,
-        num_features=num_features,
-        num_samples=500
-    )
+#     explanation = explainer.explain_instance(
+#         user_input,
+#         predict_proba,
+#         num_features=num_features,
+#         num_samples=500
+#     )
 
-    print("Visualisasi Kata Kunci:")
-    print(explanation.as_list())
+#     print("Visualisasi Kata Kunci:")
+#     print(explanation.as_list())
 
-    # Simpan hasil penjelasan
-    html_explanation = explanation.as_html()
-    with open("lime_explanation.html", "w", encoding="utf-8") as f:
-        f.write(html_explanation)
-    print("Penjelasan LIME disimpan di: lime_explanation.html")
-    return html_explanation
+#     # Simpan hasil penjelasan
+#     html_explanation = explanation.as_html()
+#     with open("lime_explanation.html", "w", encoding="utf-8") as f:
+#         f.write(html_explanation)
+#     print("Penjelasan LIME disimpan di: lime_explanation.html")
+#     return html_explanation
 
-user_input = "Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok?"
-answer = get_answer(user_input)
-print("Jawaban:")
-print(answer)
+# user_input = "Dok, saya mau tanya lebih bahaya mana rokok elektrik atau rokok tembakau ya dok?"
+# answer = get_answer(user_input)
+# print("Jawaban:")
+# print(answer)
 
-explain_answer_with_lime(user_input)
+# explain_answer_with_lime(user_input)
