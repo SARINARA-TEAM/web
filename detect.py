@@ -4,10 +4,16 @@ from tensorflow.keras.models import load_model
 import tensorflow as tf
 
 # Load model
-MODEL_PATH = 'models/mobilenetv2_binary_classifier8.h5'
+# MODEL_PATH = 'models/mobilenetv2_binary_classifier8.h5'
 # MODEL_PATH = 'models/mobilenetv2(1).h5'
 # MODEL_PATH = 'models/mobilenetv2cll1.h5'
 # MODEL_PATH = 'models/mobilenetv2cll2.h5'
+MODEL_PATH = 'models/mobilenetv2cll3.h5'
+# MODEL_PATH = 'models/mobilenetv2cll4.h5'
+# MODEL_PATH = 'models/mobilenetv2cll5.h5'
+
+
+
 
 
 HAAR_CASCADE_PATH = 'models/haarcascade_frontalface_alt2.xml'
