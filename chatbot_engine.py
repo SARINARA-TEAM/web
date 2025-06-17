@@ -226,7 +226,7 @@ def clean_answer(text):
     text = text.lower()
     
     for phrase in custom_stopwords_phrases:
-        text = re.sub(re.escape(phrase), '', text, flags=re.IGNORECASE)
+        text = text.replace(phrase.lower(), '')
 
     text = re.sub(r'[^a-zA-Z0-9\s.,]', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
