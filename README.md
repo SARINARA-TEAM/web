@@ -4,6 +4,9 @@
 
 This project detects smoking activities in real-time using computer vision. The ESP32-CAM streams live video feed to Raspberry Pi 5, where a trained model performs inference to detect smoking actions. When a smoking event is detected, an audio alert is triggered through a connected speaker. All detections are logged and can be monitored in real-time via a web interface.
 
+### System Flow
+<img width="431" height="673" alt="system flow" src="https://github.com/user-attachments/assets/c320a252-2d71-4309-a4c4-e6b6b4339e62" />
+
 ## Tech Stack
 
 ### Backend:
