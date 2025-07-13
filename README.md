@@ -14,6 +14,8 @@ This project detects smoking activities in real-time using computer vision. The 
 - Audio alert via speaker
 - Web-based dashboard for monitoring
 - Detection logging into SQLite database
+- Chatbot about health risks
+- Smoker clustering map in Indonesia province
 
 ## Tech Stack
 
