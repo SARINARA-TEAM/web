@@ -7,6 +7,14 @@ This project detects smoking activities in real-time using computer vision. The 
 ### System Flow
 <img width="431" height="673" alt="system flow" src="https://github.com/user-attachments/assets/c320a252-2d71-4309-a4c4-e6b6b4339e62" />
 
+## Features
+
+- Real-time smoking detection
+- Live video stream from ESP32-CAM
+- Audio alert via speaker
+- Web-based dashboard for monitoring
+- Detection logging into SQLite database
+
 ## Tech Stack
 
 ### Backend:
@@ -37,15 +45,7 @@ This project detects smoking activities in real-time using computer vision. The 
 - LIME
 - SQLAlchemy
 
-## Features
-
-- Real-time smoking detection
-- Live video stream from ESP32-CAM
-- Audio alert via speaker
-- Web-based dashboard for monitoring
-- Detection logging into SQLite database
-
-## 🛠️ How to Run
+## How to Run
 
 ### 1. Hardware Setup
 - Flash firmware onto ESP32-CAM (Check this : https://github.com/SARINARA-TEAM/esp32cam )
@@ -55,6 +55,7 @@ This project detects smoking activities in real-time using computer vision. The 
 ### 2. Setup Environment (on Raspberry Pi 5 in this case)
 Clone this repo, then follow this step.
 ```bash
+cd <your_path>
 python3 -m venv venv
 source venv/bin/activate
 
@@ -63,7 +64,6 @@ pip install -r requirements.txt
 
 ### 3. Run the App
 ```bash
-cd <your_path>
 python app.py
 ```
 
